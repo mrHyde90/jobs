@@ -1,8 +1,9 @@
-import Expo from 'expo';
+import Expo, {Notifications} from 'expo';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Alert } from 'react-native';
 import { Provider } from 'react-redux';
 
+import registerForNotifications from './services/push_notifications';
 import store from './store';
 import {TabNavigator, StackNavigator} from 'react-navigation';
 import AuthScreen from './screens/AuthScreen';
@@ -13,6 +14,21 @@ import SettingsScreen from './screens/SettingsScreen';
 import ReviewScreen from './screens/ReviewScreen';
 
 export default class App extends React.Component {
+  componentDidMount(){
+    //date cuenta que es una funcion
+    registerForNotifications();
+    Notifications.addListener((notification) => {
+      const {data: {text}, origin } = notification;
+      //const text = notification.data.text
+      if(origin === 'received' && text){
+        Alert.alert(
+          'New Push Notification',
+          text,
+          [{text: 'Ok.'}]
+        );
+      }
+    });
+  }
   //One of the biggest gotcha
   //react-navigation renderiza a todos los que se encuentren en el tab navigator
   render() {
